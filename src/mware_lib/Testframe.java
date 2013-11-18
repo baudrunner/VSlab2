@@ -1,7 +1,5 @@
-package test;
+package mware_lib;
 
-import mware_lib.LocalNameService;
-import mware_lib.NameService;
 
 public class Testframe {
 	

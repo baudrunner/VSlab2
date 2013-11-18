@@ -6,7 +6,6 @@ import java.net.Socket;
 import java.util.HashMap;
 
 import tcp_advanced.Connection;
-import test.RemoteCallDescriptor;
 
 public class LocalNameService extends NameService{
 	
@@ -94,6 +93,9 @@ public class LocalNameService extends NameService{
 			System.out.println("LocalNameService: waiting for remote method call...");
 			RemoteCallDescriptor rcd = (RemoteCallDescriptor)conn.receive();
 			System.out.println(rcd.method + " on objekt " + rcd.objName + " should be called.."); 
+			
+			Object o = remoteObjects.get(rcd.objName);
+			
 			
 			System.out.println("parameter:");
 			while(!rcd.params.isEmpty()){

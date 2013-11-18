@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import test.RemoteCallDescriptor;
+import mware_lib.RemoteCallDescriptor;
 
 public class Client {
 	private Socket MySocket;	
