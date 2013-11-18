@@ -30,7 +30,9 @@ public class ObjectBroker { //- Front-End der Middleware -
 	}
 
 
-	public void shutDown() {...}
+	public void shutDown() {
+		
+	}
 	// Beendet die Benutzung der Middleware in dieser Anwendung.
 
 }
