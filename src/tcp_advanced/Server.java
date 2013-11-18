@@ -33,18 +33,14 @@ public class Server {
 		Connection myConnection = theServer.getConnection();		
 		
 		// Kommunikation
-		try {
-			System.out.println("SERVER: waiting for message from client...");
-			Object cmsg = myConnection.receive();
-			System.out.println("received: " + cmsg);
-			if(cmsg instanceof SerialTestClass && ((SerialTestClass) cmsg).s.equals("gib ma ne Exception") ){
-				try{ Object o = null; o.toString();}
-				catch(Exception e){ myConnection.send(e); };
-			}
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		System.out.println("SERVER: waiting for message from client...");
+		Object cmsg = myConnection.receive();
+		System.out.println("received: " + cmsg);
+		if(cmsg instanceof SerialTestClass && ((SerialTestClass) cmsg).s.equals("gib ma ne Exception") ){
+			try{ Object o = null; o.toString();}
+			catch(Exception e){ myConnection.send(e); };
 		}
+		
 		
 		
 		//myConnection.send(new SerialTestClass(3, 5L, "testantwort vom Server", new Date()));

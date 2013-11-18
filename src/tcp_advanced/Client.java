@@ -5,7 +5,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
+
+import test.RemoteCallDescriptor;
 
 public class Client {
 	private Socket MySocket;	
@@ -51,13 +54,17 @@ public class Client {
 		
 		try{
 			// Verbindung aufbauen
-			myClient = new Client("localhost", 14002);
+			myClient = new Client("localhost", 14003);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	
+		ArrayList<Object> params = new ArrayList<Object>();
+		params.add("parameter1");
+		
 		// Kommunikation
-		myClient.send(new SerialTestClass(1, 2L, "gib ma ne Exception", new Date()));
+		myClient.send(new RemoteCallDescriptor("objektnamedenderclienthatte", "methodennameauchvomc",params));
+		//myClient.send(new SerialTestClass(1, 2L, "gib ma ne Exception", new Date()));
 		
 		try {
 			Object smsg = myClient.receive();

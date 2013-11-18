@@ -1,11 +1,8 @@
 package tcp_advanced;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 
 public class Connection {
@@ -17,8 +14,19 @@ public class Connection {
 		Out = new ObjectOutputStream(socket.getOutputStream());		
 	}
 	
-	public Object receive() throws IOException, ClassNotFoundException {
-		return In.readObject();
+	public Object receive(){
+		
+		try {
+			return In.readObject();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	public void send(Object message) throws IOException {
