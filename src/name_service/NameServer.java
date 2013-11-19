@@ -52,17 +52,23 @@ public class NameServer {
 			}	
 			System.out.println("SERVER: waiting for message from client...");
 			Object cmsg = myConnection.receive();
-			try {
-				myConnection.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			System.out.println("received: " + cmsg);
 			
 			if(cmsg instanceof NameServerRecord){
 				remoteObjects.put(((NameServerRecord) cmsg).getName(), ((NameServerRecord) cmsg).getAdress());
 				System.out.println("Neues Objekt zum NameServer hinzugefuegt Klasse ist: " + ((NameServerRecord) cmsg).getClassObject());
+			}else if(cmsg instanceof String){
+				try {
+					myConnection.send(remoteObjects.get((String)cmsg));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			try {
+				myConnection.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
