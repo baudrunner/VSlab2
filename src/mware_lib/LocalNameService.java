@@ -82,9 +82,11 @@ public class LocalNameService extends NameService{
 	@Override
 	public Object resolve(String name) {
 		
+		System.out.println("Resolve-Methode aufgerufen");
 		Connection connection = null;
 		try {
 			connection = new Connection(new Socket( NameServerAdress, NameServerPort ));
+			System.out.println("Connection Zum NameServer aufgebaut");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,10 +96,13 @@ public class LocalNameService extends NameService{
 		}
 		
 		connection.send(name);
+		System.out.println("Anfrage für Objekt gesendet");
 		
 		HostDescriptor objectHoster =  (HostDescriptor)connection.receive();
 		if(objectHoster == null){
 			System.out.println("objekt nicht vorhanden");
+		}else{
+			System.out.println("Objekt vorhanden");
 		}
 		
 		// TODO Auto-generated method stub

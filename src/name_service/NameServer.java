@@ -58,11 +58,7 @@ public class NameServer {
 				remoteObjects.put(((NameServerRecord) cmsg).getName(), ((NameServerRecord) cmsg).getAdress());
 				System.out.println("Neues Objekt zum NameServer hinzugefuegt Klasse ist: " + ((NameServerRecord) cmsg).getClassObject());
 			}else if(cmsg instanceof String){
-				try {
 					myConnection.send(remoteObjects.get((String)cmsg));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 			}
 			
 			try {
