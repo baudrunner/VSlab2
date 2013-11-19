@@ -60,7 +60,7 @@ public class Client {
 		}
 	
 		ArrayList<Object> params = new ArrayList<Object>();
-		params.add("parameter1");
+		params.add("parameter2");
 		
 		// Kommunikation
 		myClient.send(new RemoteCallDescriptor("objektnamedenderclienthatte", "methodennameauchvomc",params));
