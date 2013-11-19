@@ -1,6 +1,7 @@
 package mware_lib;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,11 +11,9 @@ import java.util.HashMap;
 import tcp_advanced.Connection;
 
 public class LocalNameService extends NameService{
-	
-	private ObjectOutputStream OutToNameServer;
+
 	private	HostDescriptor host;
 	private String NameServerAdress;
-	Socket socket;
 	ServerSocket servSocket; //auf diesem Socket werden Befehle (fuer z.B. methodenaufrufe) entgegengenommen
 	int serverListenPort = 14003;
 	int NameServerPort = 14009;
@@ -36,24 +35,11 @@ public class LocalNameService extends NameService{
 		}
 		
 	}
-	
-	public void send(Object o) throws IOException  {
-		System.out.println("CLIENT: send(Object o)");
-		OutToNameServer.writeObject(o);
-		OutToNameServer.flush();
-		
-	}
-	
-	public void close() throws IOException {
-		socket.shutdownOutput();
-		OutToNameServer.close();
-		socket.close();
-	}
-	// TODO: vielleicht noch ein close für den Socket machen
-	
 
 	@Override
 	public void rebind(Object servant, String name) {
+		ObjectOutputStream outToNameServer = null;
+		Socket socket = null;
 		try {
 			socket = new Socket( NameServerAdress, NameServerPort );
 		} catch (UnknownHostException e1) {
@@ -63,9 +49,10 @@ public class LocalNameService extends NameService{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 		System.out.println("LocalNameService: making object " + servant + " under name:" + name);
 		try {
-			OutToNameServer = new ObjectOutputStream( socket.getOutputStream() );
+			outToNameServer = new ObjectOutputStream( socket.getOutputStream() );
 			System.out.println("Verbindung vom LocalNameService zum Nameserver aufgebaut");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -73,14 +60,17 @@ public class LocalNameService extends NameService{
 		}
 		NameServerRecord record = new NameServerRecord(host, name,servant.getClass()); // Port, Ip und Name 
 		try {
-			send(record); // sende neuen Eintrag zum NameServer
+			outToNameServer.writeObject(record);
+			outToNameServer.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		try {
-			close();
+			socket.shutdownOutput();
+			outToNameServer.close();
+			socket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -92,6 +82,23 @@ public class LocalNameService extends NameService{
 	@Override
 	public Object resolve(String name) {
 		
+		Connection connection = null;
+		try {
+			connection = new Connection(new Socket( NameServerAdress, NameServerPort ));
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		connection.send(name);
+		
+		HostDescriptor objectHoster =  (HostDescriptor)connection.receive();
+		if(objectHoster == null){
+			System.out.println("objekt nicht vorhanden");
+		}
 		
 		// TODO Auto-generated method stub
 		return null;
@@ -134,12 +141,8 @@ public class LocalNameService extends NameService{
 		Connection conn;
 		
 		public RemoteMethodCallListener(Socket sock){
-			try {
+
 				conn = new Connection(sock);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 
 		@Override

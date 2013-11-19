@@ -2,6 +2,8 @@ package mware_lib;
 
 import java.util.ArrayList;
 
+import bank_access.AccountImplBase;
+
 
 public class Testframe {
 	
@@ -17,6 +19,13 @@ public class Testframe {
 		objBroker.shutDown();
 		
 		
+//		ObjectBroker objBroker2 = ObjectBroker.init("localhost",14002);
+//		NameService nameSvc2 = objBroker.getNameService();
+//		Object rawObjRef = nameSvc.resolve(KontoID);
+//		AccountImplBase konto = AccountImplBase.narrowCast(rawObjRef);
+//		//liefert spezialisiertes Stellvertreterobjekt
+//		double b = konto.getBalance();
+
 		//ns.rebind("blabla", "name1");
 	}
 
