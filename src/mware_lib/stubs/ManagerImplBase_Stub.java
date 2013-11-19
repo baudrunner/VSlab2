@@ -1,7 +1,8 @@
-package mware_lib;
+package mware_lib.stubs;
 
 import java.util.ArrayList;
 
+import mware_lib.RemoteCall_I;
 import bank_access.ManagerImplBase;
 import bank_access.OverdraftException;
 
