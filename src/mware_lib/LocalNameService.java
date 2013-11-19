@@ -71,7 +71,7 @@ public class LocalNameService extends NameService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		NameServerRecord record = new NameServerRecord(host, name); // Port, Ip und Name 
+		NameServerRecord record = new NameServerRecord(host, name,servant.getClass()); // Port, Ip und Name 
 		try {
 			send(record); // sende neuen Eintrag zum NameServer
 		} catch (IOException e) {

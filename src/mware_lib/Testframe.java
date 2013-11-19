@@ -11,11 +11,10 @@ public class Testframe {
 		
 		String konto = "kontoObjekt";
 		
-		ObjectBroker objBroker = ObjectBroker.init("141.22.87.152",14002);
+		ObjectBroker objBroker = ObjectBroker.init("localhost",14002);
 		NameService nameSvc = objBroker.getNameService();
-		nameSvc.rebind((Object) konto, "ID:5");
+		nameSvc.rebind((Object)new HostDescriptor("aaaadresse", 1234), "ID:5");
 		objBroker.shutDown();
-		
 		
 		
 		//ns.rebind("blabla", "name1");

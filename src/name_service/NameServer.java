@@ -62,7 +62,7 @@ public class NameServer {
 			
 			if(cmsg instanceof NameServerRecord){
 				remoteObjects.put(((NameServerRecord) cmsg).getName(), ((NameServerRecord) cmsg).getAdress());
-				System.out.println("Neues Objekt zum NameServer hinzugefuegt");
+				System.out.println("Neues Objekt zum NameServer hinzugefuegt Klasse ist: " + ((NameServerRecord) cmsg).getClassObject());
 			}
 		}
 	}
