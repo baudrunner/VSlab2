@@ -58,12 +58,9 @@ public class Client {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-	
-		ArrayList<Object> params = new ArrayList<Object>();
-		params.add("parameter2");
 		
 		// Kommunikation
-		myClient.send(new RemoteCallDescriptor("objektnamedenderclienthatte", "methodennameauchvomc",params));
+		myClient.send(new RemoteCallDescriptor("objektnamedenderclienthatte", "methodennameauchvomc","parameter2"));
 		//myClient.send(new SerialTestClass(1, 2L, "gib ma ne Exception", new Date()));
 		
 		try {

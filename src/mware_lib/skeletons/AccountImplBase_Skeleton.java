@@ -23,41 +23,17 @@ public class AccountImplBase_Skeleton extends AccountImplBase {
 
 	@Override
 	public void transfer(double amount) throws OverdraftException {
-		Connection conn = null;
-		try {
-			conn = new Connection(new Socket(remoteObject.getHostDescriptor().getAdress(), remoteObject.getHostDescriptor().getPort()));
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Object resu = RemoteCaller.callMethod(remoteObject.getHostDescriptor(), new RemoteCallDescriptor(remoteObject.getName(), "transfer", amount));
 		
-		ArrayList<Object> params = new ArrayList<Object>();
-		params.add(amount);
-		conn.send(new RemoteCallDescriptor(remoteObject.getName(), "transfer", params));
-		Object returnVal = conn.receive();
-
+		if(resu instanceof OverdraftException){
+			throw (OverdraftException)resu;
+		}
 	}
 
 	@Override
 	public double getBalance() {
-		Connection conn = null;
-		try {
-			conn = new Connection(new Socket(remoteObject.getHostDescriptor().getAdress(), remoteObject.getHostDescriptor().getPort()));
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		ArrayList<Object> params = new ArrayList<Object>();
-		conn.send(new RemoteCallDescriptor(remoteObject.getName(), "getBalance", params));
-		Object returnVal = conn.receive();
-		return (double) returnVal;
+		Object resu = RemoteCaller.callMethod(remoteObject.getHostDescriptor(), new RemoteCallDescriptor(remoteObject.getName(), "getBalance"));
+		return (double) resu;
 	}
 
 }
