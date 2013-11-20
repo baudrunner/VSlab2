@@ -14,11 +14,8 @@ import bank_access.OverdraftException;
 public class AccountImplBase_Skeleton extends AccountImplBase {
 	
 	NameServerRecord remoteObject; 
-	
-	public AccountImplBase_Skeleton(NameServerRecord remoteObject){
-		
+	public AccountImplBase_Skeleton(NameServerRecord remoteObject){	
 		this.remoteObject = remoteObject;
-		
 	}
 
 	@Override

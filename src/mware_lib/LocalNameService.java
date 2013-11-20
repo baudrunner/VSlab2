@@ -176,24 +176,28 @@ public class LocalNameService extends NameService{
 
 		@Override
 		public void run() {
-			//TODO: hier aufrufe von einzelnen verbindungen entgegennehmen unmarshallen und auf dem lokalen objekt die aktionen ausfueheren
-			System.out.println("LocalNameService: waiting for remote method call...");
-			RemoteCallDescriptor rcd = (RemoteCallDescriptor)conn.receive();
-			System.out.println(rcd.getMethod() + " on objekt " + rcd.getObjName() + " should be called.."); 
 			
+			//while(true){
+				//TODO: hier aufrufe von einzelnen verbindungen entgegennehmen unmarshallen und auf dem lokalen objekt die aktionen ausfueheren
+				System.out.println("LocalNameService: waiting for remote method call...");
+				RemoteCallDescriptor rcd = (RemoteCallDescriptor)conn.receive();
+				System.out.println(rcd.getMethod() + " on objekt " + rcd.getObjName() + " should be called.."); 
+				
+				
+				remoteObjects.get(rcd.getObjName());
+				
+				
+				RemoteCall_I rco = remoteObjects.get(rcd.getObjName());
+				Object returnVal = rco.callMethod(rcd.getMethod(), rcd.getParams());
+				conn.send(returnVal);
+				
+				System.out.println("parameter:");
+				while(!rcd.getParams().isEmpty()){
+					System.out.println(rcd.getParams().remove(0));
+				}
+				System.out.println("##########");
+			//}
 			
-			remoteObjects.get(rcd.getObjName());
-			
-			
-			RemoteCall_I rco = remoteObjects.get(rcd.getObjName());
-			Object returnVal = rco.callMethod(rcd.getMethod(), rcd.getParams());
-			conn.send(returnVal);
-			
-			System.out.println("parameter:");
-			while(!rcd.getParams().isEmpty()){
-				System.out.println(rcd.getParams().remove(0));
-			}
-			System.out.println("##########");
 		}
 
 	}
