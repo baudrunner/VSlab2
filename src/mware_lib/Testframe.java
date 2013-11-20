@@ -27,19 +27,23 @@ public class Testframe {
 //		Object rawObjRef = nameSvc2.resolve("34");
 //		AccountImplBase konto2 = AccountImplBase.narrowCast(rawObjRef); //liefert spezialisiertes Stellvertreterobjekt
 		AccountImplBase_Test newtest = new AccountImplBase_Test();
-		nameSvc2.rebind(newtest, "nameUnseresTollenErstenTestobjekts");
+		//nameSvc2.rebind(newtest, "nameUnseresTollenErstenTestobjekts");
 		Object rawObjRef = nameSvc2.resolve("nameUnseresTollenErstenTestobjekts");
 		System.out.println( "Name des Objekts auf dem Server: "+((NameServerRecord)rawObjRef).getName());
 		System.out.println( "HostDescriptor des Objekts auf dem Server: "+((NameServerRecord)rawObjRef).getHostDescriptor());
 		AccountImplBase remoteKonto = AccountImplBase.narrowCast(rawObjRef); //liefert spezialisiertes Stellvertreterobjekt
-		try {
-			remoteKonto.transfer(50);
-		} catch (OverdraftException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		for(int i = 0; i< 100; i++){
+			try {
+				remoteKonto.transfer(50);
+			} catch (OverdraftException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			System.out.println("Aktueller Kontostand : " + remoteKonto.getBalance());
 		}
 		
-		System.out.println("Aktueller Kontostand : " + remoteKonto.getBalance());
 	//	double b = konto.getBalance();
 
 		//ns.rebind("blabla", "name1");
