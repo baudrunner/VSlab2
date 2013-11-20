@@ -17,4 +17,17 @@ public class HostDescriptor implements Serializable{
 		this.port = port;
 	}
 	
+	public String getAdress() {
+		return adress;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	@Override
+	public String toString() {
+		return "HostDescriptor [adress=" + adress + ", port=" + port + "]";
+	}
+	
 }

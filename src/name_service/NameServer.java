@@ -17,7 +17,7 @@ public class NameServer {
 	private ServerSocket MySvrSocket;
 	
 	static int serverListenPort = 14009;
-	HashMap<String, HostDescriptor> remoteObjects = new HashMap<String, HostDescriptor>();
+	HashMap<String, NameServerRecord> remoteObjects = new HashMap<String, NameServerRecord>();
 
 	
 	public NameServer(int i) throws IOException {
@@ -55,7 +55,7 @@ public class NameServer {
 			System.out.println("received: " + cmsg);
 			
 			if(cmsg instanceof NameServerRecord){
-				remoteObjects.put(((NameServerRecord) cmsg).getName(), ((NameServerRecord) cmsg).getAdress());
+				remoteObjects.put(((NameServerRecord) cmsg).getName(), (NameServerRecord)cmsg);
 				System.out.println("Neues Objekt zum NameServer hinzugefuegt Klasse ist: " + ((NameServerRecord) cmsg).getClassObject());
 			}else if(cmsg instanceof String){
 					myConnection.send(remoteObjects.get((String)cmsg));
