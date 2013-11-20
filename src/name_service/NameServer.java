@@ -31,10 +31,8 @@ public class NameServer {
 	}
 
 	public static void main(String[] args) throws IOException {
-		
 		NameServer nameSerer = new NameServer(serverListenPort);
 		nameSerer.run();
-		
 	}
 	
 	
