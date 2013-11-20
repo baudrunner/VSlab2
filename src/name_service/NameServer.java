@@ -56,6 +56,13 @@ public class NameServer {
 				remoteObjects.put(((NameServerRecord) cmsg).getName(), (NameServerRecord)cmsg);
 				System.out.println("Neues Objekt zum NameServer hinzugefuegt");
 			}else if(cmsg instanceof String){
+				System.out.println("suche im Verzeichnis nach Objekt mit Name '" + (String)cmsg + "' ...");
+				Object orderedObject = remoteObjects.get((String)cmsg);
+				if(orderedObject == null){
+					System.err.println("KeinObjekt mit Name '" + (String)cmsg + "' gefunden");
+				}else{
+					System.out.println("returning " + orderedObject);
+				}
 					myConnection.send(remoteObjects.get((String)cmsg));
 			}
 			
