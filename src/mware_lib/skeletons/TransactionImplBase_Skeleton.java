@@ -27,7 +27,7 @@ public class TransactionImplBase_Skeleton extends TransactionImplBase{
 	@Override
 	public void withdraw(String accountID, double amount) throws InvalidParamException, OverdraftException {
 		
-		Object resu = RemoteCaller.callMethod(remoteObject.getHostDescriptor(), new RemoteCallDescriptor(remoteObject.getName(), "deposit", accountID, amount));
+		Object resu = RemoteCaller.callMethod(remoteObject.getHostDescriptor(), new RemoteCallDescriptor(remoteObject.getName(), "withdraw", accountID, amount));
 		
 		if(resu instanceof InvalidParamException){
 			throw (InvalidParamException)resu;
@@ -40,7 +40,7 @@ public class TransactionImplBase_Skeleton extends TransactionImplBase{
 	@Override
 	public double getBalance(String accountID) throws InvalidParamException {
 		
-		Object resu = RemoteCaller.callMethod(remoteObject.getHostDescriptor(), new RemoteCallDescriptor(remoteObject.getName(), "deposit", accountID));
+		Object resu = RemoteCaller.callMethod(remoteObject.getHostDescriptor(), new RemoteCallDescriptor(remoteObject.getName(), "getBalance", accountID));
 		
 		if(resu instanceof InvalidParamException){
 			throw (InvalidParamException)resu;

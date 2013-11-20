@@ -9,11 +9,9 @@ public class NameServerRecord implements Serializable{
 	 */
 	private static final long serialVersionUID = -4013542117088915246L;
 	HostDescriptor hostDescriptor;
-	Class classObject;
 	String name;
 	
-	public NameServerRecord(HostDescriptor hostDescriptor, String name, Class c){
-		this.classObject = c;
+	public NameServerRecord(HostDescriptor hostDescriptor, String name){
 		this.hostDescriptor = hostDescriptor;
 		this.name = name;
 	}
@@ -24,10 +22,6 @@ public class NameServerRecord implements Serializable{
 	
 	public String getName(){
 		return this.name;
-	}
-	
-	public Class getClassObject(){
-		return classObject;
 	}
 
 }

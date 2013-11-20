@@ -31,7 +31,8 @@ public class LocalNameService extends NameService{
 		NameServerPort = listenPort;
 		// TODO Auto-generated constructor stub
 		try {
-			servSocket = new ServerSocket(serverListenPort);
+			servSocket = new ServerSocket(0);
+			System.out.println("Port mit der LocalNameService gestartet wird" + servSocket.getLocalPort());
 			//host = new HostDescriptor(servSocket.getLocalSocketAddress().toString(), serverListenPort);
 			RemoteListener remoteListener = new RemoteListener(servSocket);
 			Thread t = new Thread(remoteListener);
@@ -49,7 +50,7 @@ public class LocalNameService extends NameService{
 		Socket socket = null;
 		try {
 			socket = new Socket( NameServerAdress, NameServerPort );
-			host = new HostDescriptor(socket.getLocalAddress().toString().substring(1), serverListenPort); 
+			host = new HostDescriptor(socket.getLocalAddress().toString().substring(1), servSocket.getLocalPort()); 
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -66,7 +67,7 @@ public class LocalNameService extends NameService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		NameServerRecord record = new NameServerRecord(host, name,servant.getClass()); // Port, Ip und Name 
+		NameServerRecord record = new NameServerRecord(host, name); // Port, Ip und Name 
 		
 		
 		
@@ -120,15 +121,16 @@ public class LocalNameService extends NameService{
 		if(targetRecord == null){
 			System.out.println("objekt nicht vorhanden");
 		}else{
-			System.out.println("Objekt vorhanden auf Adresse:" + targetRecord.getClassObject() );
-			
-			
+		
+			System.out.println("objekt vorhanden");
 			
 		}
 		
 		// TODO Auto-generated method stub
 		
-		
+		System.out.println("Resolve Rueckgabewert targetRecord ausgabe von getName: " + targetRecord.getName());
+		System.out.println("Resolve Rueckgabewert targetRecord ausgabe von HostDescriptor : " + targetRecord.getHostDescriptor());
+		System.out.println("Resolve Rueckgabewert targetRecord : " + targetRecord);
 		return targetRecord;
 	}
 	
