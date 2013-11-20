@@ -29,10 +29,10 @@ public class LocalNameService extends NameService{
 		
 		NameServerAdress = serviceHost;
 		NameServerPort = listenPort;
-		host = new HostDescriptor(serviceHost, serverListenPort);
 		// TODO Auto-generated constructor stub
 		try {
 			servSocket = new ServerSocket(serverListenPort);
+			//host = new HostDescriptor(servSocket.getLocalSocketAddress().toString(), serverListenPort);
 			RemoteListener remoteListener = new RemoteListener(servSocket);
 			Thread t = new Thread(remoteListener);
 			t.start();
@@ -49,6 +49,7 @@ public class LocalNameService extends NameService{
 		Socket socket = null;
 		try {
 			socket = new Socket( NameServerAdress, NameServerPort );
+			host = new HostDescriptor(socket.getLocalAddress().toString().substring(1), serverListenPort); 
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

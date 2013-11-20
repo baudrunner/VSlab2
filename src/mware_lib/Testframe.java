@@ -21,7 +21,7 @@ public class Testframe {
 //		objBroker.shutDown();
 		
 		
-		ObjectBroker objBroker2 = ObjectBroker.init("localhost",14009);
+		ObjectBroker objBroker2 = ObjectBroker.init("141.22.82.8",14009);
 		NameService nameSvc2 = objBroker2.getNameService();
 //		nameSvc2.rebind((Object)new HostDescriptor("aaaadresse", 1234), "34");
 //		Object rawObjRef = nameSvc2.resolve("34");
