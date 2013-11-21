@@ -1,30 +1,22 @@
 package mware_lib;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.HashMap;
-
-import mware_lib.stubs.AccountImplBase_Stub;
-import mware_lib.stubs.ManagerImplBase_Stub;
-import mware_lib.stubs.TransactionImplBase_Stub;
-import cash_access.TransactionImplBase;
-import bank_access.AccountImplBase;
-import bank_access.ManagerImplBase;
-import tcp_advanced.Connection;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class LocalNameService extends NameService{
 
+	public static int threadIDcntr = 0;
 	private	HostDescriptor host;
 	private String NameServerAdress;
 	ServerSocket servSocket; //auf diesem Socket werden Befehle (fuer z.B. methodenaufrufe) entgegengenommen
-	int serverListenPort = 14003;
 	int NameServerPort;
 	HashMap<String, RemoteCall_I> remoteObjects = new HashMap<String, RemoteCall_I>();
 	Connection connection = null;
+    Lock connMutex;
 
 	public LocalNameService(String serviceHost, int listenPort) {
 		
@@ -32,6 +24,7 @@ public class LocalNameService extends NameService{
 		NameServerPort = listenPort;
 		try {
 			servSocket = new ServerSocket(0);
+			connMutex = new ReentrantLock(true);
 			System.out.println("Port mit der LocalNameService gestartet wird" + servSocket.getLocalPort());
 			Socket sockToNameServer = new Socket(NameServerAdress, NameServerPort);
 			connection = new Connection(sockToNameServer); //direkte verbindung zum NameServer
@@ -50,22 +43,17 @@ public class LocalNameService extends NameService{
 	public void rebind(Object servant, String name) {
 		
 		NameServerRecord record = new NameServerRecord(host, name); // Port, Ip und Name 
-		
-		if(servant instanceof AccountImplBase){
-			remoteObjects.put(name, new AccountImplBase_Stub((AccountImplBase)servant));
-		}else if(servant instanceof ManagerImplBase){
-			remoteObjects.put(name, new ManagerImplBase_Stub((ManagerImplBase)servant));
-		}else if(servant instanceof TransactionImplBase){
-			remoteObjects.put(name, new TransactionImplBase_Stub((TransactionImplBase)servant));
-		}
-		
+		remoteObjects.put(name, (RemoteCall_I)servant);
+		connMutex.lock();
 		connection.send(record);
+		connMutex.unlock();
 	}
 
 	@Override
 	public Object resolve(String name) {
 		
 		System.out.println("Resolve-Methode aufgerufen");
+		connMutex.lock();
 		connection.send(name);
 		System.out.println("Anfrage für Objekt gesendet");
 		
@@ -74,6 +62,8 @@ public class LocalNameService extends NameService{
 			targetRecord = (NameServerRecord)connection.receive();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}finally{
+			connMutex.unlock();
 		}
 		
 		if(targetRecord == null){
@@ -107,6 +97,7 @@ public class LocalNameService extends NameService{
 					System.out.println("...someone connected!");
 					RemoteMethodCallListener rmcl = new RemoteMethodCallListener(s);
 					Thread t = new Thread(rmcl);
+					System.out.println("spawning Thread...");
 					t.start();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -117,18 +108,20 @@ public class LocalNameService extends NameService{
 	}
 	
 	private class RemoteMethodCallListener implements Runnable{
-		
+				
+		int threadID;
 		Connection conn;
 		
 		public RemoteMethodCallListener(Socket sock){
 				conn = new Connection(sock);
+				threadID = threadIDcntr++;
 		}
 
 		@Override
 		public void run() {
 			
 			//while(true){
-				System.out.println("LocalNameService: waiting for remote method call...");
+				System.out.println("RemoteMethodCallListener["+ threadID +"]: waiting for remote method call...");
 				RemoteCallDescriptor rcd = null;
 				try {
 					rcd = (RemoteCallDescriptor)conn.receive();

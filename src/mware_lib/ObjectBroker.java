@@ -6,6 +6,7 @@ public class ObjectBroker { //- Front-End der Middleware -
 	private  String serviceHost;
 	private  int listenPort;
 	private static ObjectBroker instance = null;
+	LocalNameService localNameService = null;
 	
 	private ObjectBroker (String serviceHost,int listenPort) {
 		this.serviceHost = serviceHost;
@@ -26,7 +27,10 @@ public class ObjectBroker { //- Front-End der Middleware -
 	}
 	
 	public NameService getNameService() {// Liefert den Namensdienst (Stellvetreterobjekt).
-		return new LocalNameService(serviceHost, listenPort);
+		if(localNameService == null){
+			localNameService = new LocalNameService(serviceHost, listenPort);
+		}
+		return localNameService;
 	}
 
 

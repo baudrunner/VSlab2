@@ -1,52 +1,103 @@
 package mware_lib;
 
-import java.util.ArrayList;
-
 import bank_access.AccountImplBase;
 import bank_access.AccountImplBase_Test;
 import bank_access.OverdraftException;
 
-
 public class Testframe {
 	
-	public static void main(String args[]){
-		//NameService ns = new LocalNameService("141.22.87.152",14002);
+	public static void main(String args[]){	
+		Testframe tf = new Testframe();
+		tf.runTest();
+	}
+	
+	public void runTest(){
+		AccountImplBase_Test testkonto = new AccountImplBase_Test();
 		
+		ObjectBroker objBroker = ObjectBroker.init("lab29",14009);
+		NameService nameSvc = objBroker.getNameService();
+		nameSvc.rebind(testkonto, "testKonto1");
+		Object remoteKontoRaw = nameSvc.resolve("testKonto1");
+		AccountImplBase remoteKonto = AccountImplBase.narrowCast(remoteKontoRaw);
 		
-		String konto = "kontoObjekt";
-		
-//		ObjectBroker objBroker = ObjectBroker.init("localhost",14002);
-//		NameService nameSvc = objBroker.getNameService();
-//		nameSvc.rebind((Object)new HostDescriptor("aaaadresse", 1234), "ID:5");
-//		objBroker.shutDown();
-		
-		
-		ObjectBroker objBroker2 = ObjectBroker.init("141.22.81.128",14009);
-		NameService nameSvc2 = objBroker2.getNameService();
-//		nameSvc2.rebind((Object)new HostDescriptor("aaaadresse", 1234), "34");
-//		Object rawObjRef = nameSvc2.resolve("34");
-//		AccountImplBase konto2 = AccountImplBase.narrowCast(rawObjRef); //liefert spezialisiertes Stellvertreterobjekt
-		AccountImplBase_Test newtest = new AccountImplBase_Test();
-		nameSvc2.rebind(newtest, "nameUnseresTollenErstenTestobjekts");
-		Object rawObjRef = nameSvc2.resolve("nameUnseresTollenErstenTestobjekts");
-		System.out.println( "Name des Objekts auf dem Server: "+((NameServerRecord)rawObjRef).getName());
-		System.out.println( "HostDescriptor des Objekts auf dem Server: "+((NameServerRecord)rawObjRef).getHostDescriptor());
-		AccountImplBase remoteKonto = AccountImplBase.narrowCast(rawObjRef); //liefert spezialisiertes Stellvertreterobjekt
-		
-		for(int i = 0; i< 100; i++){
-			try {
-				remoteKonto.transfer(50);
-			} catch (OverdraftException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			System.out.println("Aktueller Kontostand : " + remoteKonto.getBalance());
+		try {
+			remoteKonto.transfer(1000);
+		} catch (OverdraftException e1) {
+			e1.printStackTrace();
 		}
 		
-	//	double b = konto.getBalance();
+		TestRunnable adder   = new TestRunnable(remoteKonto, true, 2, 200, 0);
+		Thread autoAddThread = new Thread(adder);
+		
+		TestRunnable subber  = new TestRunnable(remoteKonto, false, 4, 100, 0);
+		Thread autoSubThread = new Thread(subber);
+		
+		TestRunnable adder2   = new TestRunnable(remoteKonto, true, 2, 200, 0);
+		Thread autoAddThread2 = new Thread(adder2);
+		
+		TestRunnable subber2  = new TestRunnable(remoteKonto, false, 4, 100, 0);
+		Thread autoSubThread2 = new Thread(subber2);
+		
+		autoSubThread.start();
+		autoAddThread.start();
+		autoSubThread2.start();
+		autoAddThread2.start();
+		
+		try {
+	
+			autoSubThread.join();
+			autoAddThread.join();
+			autoSubThread2.join();
+			autoAddThread2.join();
+			
+			System.out.println("###################\n\nKontostand am Ende: " + remoteKonto.getBalance());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private class TestRunnable implements Runnable{
+		
+		AccountImplBase konto;
+		boolean addMoney;
+		double ammount; 
+		int cnt; 
+		int usleep;
+		
+		public TestRunnable(AccountImplBase konto, boolean addMoney, double ammount, int cnt, int usleep){
+			this.konto = konto;
+			this.addMoney = addMoney;
+			this.ammount = ammount;
+			this.cnt = cnt;
+			this.usleep = usleep;
+		}
 
-		//ns.rebind("blabla", "name1");
+		@Override
+		public void run() {
+			
+			int i = 0;
+			while(i < cnt){
+				if(addMoney){
+					try {
+						konto.transfer(ammount);
+						System.out.println("Kontostand: " + konto.getBalance() );
+					} catch (OverdraftException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}else{
+					try {
+						konto.transfer(ammount*-1.0);
+						System.out.println("Kontostand: " + konto.getBalance() );
+					} catch (OverdraftException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				i++;
+			}
+		}
 	}
 
 }

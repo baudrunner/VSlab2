@@ -1,9 +1,8 @@
-package mware_lib.skeletons;
+package bank_access;
 
 import mware_lib.NameServerRecord;
 import mware_lib.RemoteCallDescriptor;
-import bank_access.ManagerImplBase;
-import bank_access.OverdraftException;
+import mware_lib.RemoteCaller;
 
 public class ManagerImplBase_Skeleton extends ManagerImplBase {
 	NameServerRecord remoteObject; 

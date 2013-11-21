@@ -1,13 +1,10 @@
-package mware_lib.skeletons;
+package mware_lib;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import tcp_advanced.Connection;
-import mware_lib.HostDescriptor;
-import mware_lib.RemoteCallDescriptor;
 
 public class RemoteCaller {
 

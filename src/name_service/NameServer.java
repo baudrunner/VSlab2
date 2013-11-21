@@ -2,15 +2,10 @@ package name_service;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.rmi.server.RemoteObject;
 import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import tcp_advanced.Connection;
-import tcp_advanced.Server;
-import mware_lib.HostDescriptor;
+import mware_lib.Connection;
 import mware_lib.NameServerRecord;
 
 
@@ -38,7 +33,7 @@ public class NameServer {
 		NameServer nameServer = new NameServer(serverListenPort);
 		nameServer.listen();
 	}
-	
+
 	public void listen(){
 		while(true){
 			try {

@@ -1,0 +1,4 @@
+java -cp .:geldautomat.jar geldautomat.Geldautot lab29 14009 -v
+java -cp .:filiale.jar filiale.Filiale lab29 14009 -v
+java -cp .:bank.jar bank.Bank lab29 14009 -v
+java name_service.NameServer

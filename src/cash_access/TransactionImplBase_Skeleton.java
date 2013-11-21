@@ -1,10 +1,8 @@
-package mware_lib.skeletons;
+package cash_access;
 
 import mware_lib.NameServerRecord;
 import mware_lib.RemoteCallDescriptor;
-import cash_access.InvalidParamException;
-import cash_access.OverdraftException;
-import cash_access.TransactionImplBase;
+import mware_lib.RemoteCaller;
 
 public class TransactionImplBase_Skeleton extends TransactionImplBase{
 	

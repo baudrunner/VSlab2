@@ -1,0 +1,14 @@
+Bank resolved.
+Account created 3897
+Magic key is 3533.0
+transfer O.K.
+-> Press ENTER to exit application...
+
+Calling shutDown()...Done.
+Thread Thread-0 running=true class:java.lang.Thread
+Thread Reference Handler running=true class:java.lang.ref.Reference$ReferenceHandler
+Thread Finalizer running=true class:java.lang.ref.Finalizer$FinalizerThread
+Thread main running=true class:java.lang.Thread
+Thread Signal Dispatcher running=true class:java.lang.Thread
+Wait for termination...
+...FINISHED!
