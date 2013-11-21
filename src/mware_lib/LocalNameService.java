@@ -141,6 +141,9 @@ public class LocalNameService extends NameService{
 								
 				RemoteCall_I rco = remoteObjects.get(rcd.getObjName());
 				Object returnVal = rco.callMethod(rcd.getMethod(), rcd.getParams());
+				if(returnVal instanceof Exception){
+					System.err.println("Fehler beim Aufruf von " + rcd.getMethod() + " auf Object " + rcd.getObjName() + " -> sende Exception an aufrufenden Host..");
+				}
 				conn.send(returnVal);
 				
 				System.out.println("parameter:");
