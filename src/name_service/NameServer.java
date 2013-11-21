@@ -31,47 +31,62 @@ public class NameServer {
 	}
 
 	public static void main(String[] args) throws IOException {
-		NameServer nameSerer = new NameServer(serverListenPort);
-		nameSerer.run();
+		NameServer nameServer = new NameServer(serverListenPort);
+		nameServer.listen();
 	}
 	
-	
-	private void run(){
-		
+	public void listen(){
 		while(true){
-			// Auf Verbindungsanfrage warten.
-			System.out.println("SERVER: waiting for client to connect...");
-			Connection myConnection = null;
 			try {
-				myConnection = getConnection();
+				NameServerListener nlr = new NameServerListener(getConnection());
+				Thread listenerThread = new Thread(nlr);
+				listenerThread.start();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
-			System.out.println("SERVER: waiting for message from client...");
-			Object cmsg = myConnection.receive();
-			System.out.println("received: " + cmsg);
-			
-			if(cmsg instanceof NameServerRecord){
-				remoteObjects.put(((NameServerRecord) cmsg).getName(), (NameServerRecord)cmsg);
-				System.out.println("Neues Objekt zum NameServer hinzugefuegt");
-			}else if(cmsg instanceof String){
-				System.out.println("suche im Verzeichnis nach Objekt mit Name '" + (String)cmsg + "' ...");
-				Object orderedObject = remoteObjects.get((String)cmsg);
-				if(orderedObject == null){
-					System.err.println("KeinObjekt mit Name '" + (String)cmsg + "' gefunden");
-				}else{
-					System.out.println("returning " + orderedObject);
-				}
-					myConnection.send(remoteObjects.get((String)cmsg));
-			}
-			
-			try {
-				myConnection.close();
-			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
+	
+	private class NameServerListener implements Runnable{
+		
+		private Connection clientConnection; 
+		
+		public NameServerListener(Connection clientConn){
+			clientConnection = clientConn;
+		}
 
+		@Override
+		public void run() {
+			
+			while(true){
+				System.out.println("SERVER: waiting for message from client...");
+				Object cmsg = null;
+				try {
+					cmsg = clientConnection.receive();
+				} catch (IOException e) {
+					System.err.println("Client " + clientConnection.getRemoteIP() +":"+ clientConnection.getRemotePort() + " hat Verbindung beendet!");
+					//e.printStackTrace();
+					break;
+				}
+				
+				System.out.println("received: " + cmsg);
+				if(cmsg instanceof NameServerRecord){ //Host meldet Objekt unter Name an
+					remoteObjects.put(((NameServerRecord) cmsg).getName(), (NameServerRecord)cmsg);
+					System.out.println("Neues Objekt zum NameServer hinzugefuegt");
+				}else if(cmsg instanceof String){//Host moechte Eintrag von Objekt mit name 'cmsg'
+					System.out.println("suche im Verzeichnis nach Objekt mit Name '" + (String)cmsg + "' ...");
+					Object orderedObject = remoteObjects.get((String)cmsg);
+					if(orderedObject == null){
+						System.err.println("KeinObjekt mit Name '" + (String)cmsg + "' gefunden");
+					}else{
+						System.out.println("returning " + orderedObject);
+					}
+					clientConnection.send(remoteObjects.get((String)cmsg));
+				}
+			}			
+		}
+
+	}
+	
 }

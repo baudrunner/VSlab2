@@ -26,7 +26,12 @@ public class RemoteCaller {
 
 		conn.send(rcd);
 		
-		return conn.receive();
+		try {
+			return conn.receive();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 		
 	}
 }

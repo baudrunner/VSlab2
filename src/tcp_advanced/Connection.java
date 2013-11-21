@@ -12,9 +12,10 @@ public class Connection {
 	private ObjectOutputStream Out;
 	private InputStream inStream;
 	private OutputStream outStream;
+	private Socket socket;
 	
 	public Connection(Socket socket){
-		
+		this.socket = socket;
 		try {
 			outStream = socket.getOutputStream();
 			Out = new ObjectOutputStream(outStream);
@@ -30,15 +31,17 @@ public class Connection {
 		}		
 	}
 	
-	public Object receive(){
+	public Object receive() throws IOException{
 		
 		try {
 			return In.readObject();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		} 
+//		catch (IOException e) {
+//			e.printStackTrace();
+//			throw e;
+//		}
 		
 		return null;
 	}
@@ -57,5 +60,13 @@ public class Connection {
 	public void close() throws IOException {
 		In.close();
 		Out.close();
+	}
+	
+	public String getRemoteIP(){
+		return socket.getInetAddress().toString().substring(1);//schneidet slash am anfang ab..
+	}
+	
+	public int getRemotePort(){
+		return socket.getPort();
 	}
 }

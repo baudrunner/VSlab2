@@ -24,16 +24,18 @@ public class LocalNameService extends NameService{
 	int serverListenPort = 14003;
 	int NameServerPort;
 	HashMap<String, RemoteCall_I> remoteObjects = new HashMap<String, RemoteCall_I>();
+	Connection connection = null;
 
 	public LocalNameService(String serviceHost, int listenPort) {
 		
 		NameServerAdress = serviceHost;
 		NameServerPort = listenPort;
-		// TODO Auto-generated constructor stub
 		try {
 			servSocket = new ServerSocket(0);
 			System.out.println("Port mit der LocalNameService gestartet wird" + servSocket.getLocalPort());
-			//host = new HostDescriptor(servSocket.getLocalSocketAddress().toString(), serverListenPort);
+			Socket sockToNameServer = new Socket(NameServerAdress, NameServerPort);
+			connection = new Connection(sockToNameServer); //direkte verbindung zum NameServer
+			host = new HostDescriptor(sockToNameServer.getLocalAddress().toString().substring(1), servSocket.getLocalPort());
 			RemoteListener remoteListener = new RemoteListener(servSocket);
 			Thread t = new Thread(remoteListener);
 			t.start();
@@ -41,53 +43,13 @@ public class LocalNameService extends NameService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	@Override
 	public void rebind(Object servant, String name) {
-		ObjectOutputStream outToNameServer = null;
-		Socket socket = null;
-		try {
-			socket = new Socket( NameServerAdress, NameServerPort );
-			host = new HostDescriptor(socket.getLocalAddress().toString().substring(1), servSocket.getLocalPort()); 
-		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		
-		System.out.println("LocalNameService: making object " + servant + " under name:" + name);
-		try {
-			outToNameServer = new ObjectOutputStream( socket.getOutputStream() );
-			System.out.println("Verbindung vom LocalNameService zum Nameserver aufgebaut");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		NameServerRecord record = new NameServerRecord(host, name); // Port, Ip und Name 
-		
-		
-		
-		try {
-			outToNameServer.writeObject(record);
-			outToNameServer.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try {
-			socket.shutdownOutput();
-			outToNameServer.close();
-			socket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		
 		if(servant instanceof AccountImplBase){
 			remoteObjects.put(name, new AccountImplBase_Stub((AccountImplBase)servant));
@@ -96,37 +58,29 @@ public class LocalNameService extends NameService{
 		}else if(servant instanceof TransactionImplBase){
 			remoteObjects.put(name, new TransactionImplBase_Stub((TransactionImplBase)servant));
 		}
+		
+		connection.send(record);
 	}
 
 	@Override
 	public Object resolve(String name) {
 		
 		System.out.println("Resolve-Methode aufgerufen");
-		Connection connection = null;
-		try {
-			connection = new Connection(new Socket( NameServerAdress, NameServerPort ));
-			System.out.println("Connection Zum NameServer aufgebaut");
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		connection.send(name);
 		System.out.println("Anfrage für Objekt gesendet");
 		
-		NameServerRecord targetRecord =  (NameServerRecord)connection.receive();
+		NameServerRecord targetRecord = null;
+		try {
+			targetRecord = (NameServerRecord)connection.receive();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		if(targetRecord == null){
 			System.out.println("objekt nicht vorhanden");
 		}else{
-		
 			System.out.println("objekt vorhanden");
-			
 		}
-		
-		// TODO Auto-generated method stub
 		
 		System.out.println("Resolve Rueckgabewert targetRecord ausgabe von getName: " + targetRecord.getName());
 		System.out.println("Resolve Rueckgabewert targetRecord ausgabe von HostDescriptor : " + targetRecord.getHostDescriptor());
@@ -137,8 +91,7 @@ public class LocalNameService extends NameService{
 	private class RemoteListener implements Runnable{
 		
 		ServerSocket serSock;
-		
-		
+
 		public RemoteListener(ServerSocket s){
 			serSock = s;
 		}
@@ -158,13 +111,9 @@ public class LocalNameService extends NameService{
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
-				
-				 
+				} 
 			}
-			
 		}
-
 	}
 	
 	private class RemoteMethodCallListener implements Runnable{
@@ -172,7 +121,6 @@ public class LocalNameService extends NameService{
 		Connection conn;
 		
 		public RemoteMethodCallListener(Socket sock){
-
 				conn = new Connection(sock);
 		}
 
@@ -180,15 +128,17 @@ public class LocalNameService extends NameService{
 		public void run() {
 			
 			//while(true){
-				//TODO: hier aufrufe von einzelnen verbindungen entgegennehmen unmarshallen und auf dem lokalen objekt die aktionen ausfueheren
 				System.out.println("LocalNameService: waiting for remote method call...");
-				RemoteCallDescriptor rcd = (RemoteCallDescriptor)conn.receive();
+				RemoteCallDescriptor rcd = null;
+				try {
+					rcd = (RemoteCallDescriptor)conn.receive();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				System.out.println(rcd.getMethod() + " on objekt " + rcd.getObjName() + " should be called.."); 
 				
-				
 				remoteObjects.get(rcd.getObjName());
-				
-				
+								
 				RemoteCall_I rco = remoteObjects.get(rcd.getObjName());
 				Object returnVal = rco.callMethod(rcd.getMethod(), rcd.getParams());
 				conn.send(returnVal);
