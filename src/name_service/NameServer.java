@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.server.RemoteObject;
 import java.util.HashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import tcp_advanced.Connection;
 import tcp_advanced.Server;
@@ -18,9 +20,11 @@ public class NameServer {
 	
 	static int serverListenPort = 14009;
 	HashMap<String, NameServerRecord> remoteObjects = new HashMap<String, NameServerRecord>();
+	Lock mutex;
 
 	
 	public NameServer(int i) throws IOException {
+		mutex = new ReentrantLock(true);
 		System.out.println("initializing NameServer...");
 		MySvrSocket = new ServerSocket(serverListenPort);
 		System.out.println("Server initialized! listening on port " + serverListenPort);
@@ -72,11 +76,15 @@ public class NameServer {
 				
 				System.out.println("received: " + cmsg);
 				if(cmsg instanceof NameServerRecord){ //Host meldet Objekt unter Name an
+					mutex.lock();
 					remoteObjects.put(((NameServerRecord) cmsg).getName(), (NameServerRecord)cmsg);
+					mutex.unlock();
 					System.out.println("Neues Objekt zum NameServer hinzugefuegt");
 				}else if(cmsg instanceof String){//Host moechte Eintrag von Objekt mit name 'cmsg'
 					System.out.println("suche im Verzeichnis nach Objekt mit Name '" + (String)cmsg + "' ...");
+					mutex.lock();
 					Object orderedObject = remoteObjects.get((String)cmsg);
+					mutex.unlock();
 					if(orderedObject == null){
 						System.err.println("KeinObjekt mit Name '" + (String)cmsg + "' gefunden");
 					}else{

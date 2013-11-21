@@ -13,7 +13,6 @@ public class ManagerImplBase_Skeleton extends ManagerImplBase {
 	}
 	@Override
 	public String createAccount(String owner, String branch) {
-		
 		Object resu = RemoteCaller.callMethod(remoteObject.getHostDescriptor(), new RemoteCallDescriptor(remoteObject.getName(), "createAccount", owner, branch));
 		return (String)resu;
 	}

@@ -44,8 +44,10 @@ public class TransactionImplBase_Skeleton extends TransactionImplBase{
 		
 		if(resu instanceof InvalidParamException){
 			throw (InvalidParamException)resu;
+		}else{
+			return (double)resu;
 		}
-		return (double)resu;
+		
 	}
 
 }
