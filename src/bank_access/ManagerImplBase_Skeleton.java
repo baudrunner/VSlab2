@@ -1,6 +1,6 @@
 package bank_access;
 
-import mware_lib.NameServerRecord;
+import name_service.NameServerRecord;
 import mware_lib.RemoteCallDescriptor;
 import mware_lib.RemoteCaller;
 

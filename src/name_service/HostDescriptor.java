@@ -1,4 +1,4 @@
-package mware_lib;
+package name_service;
 
 import java.io.Serializable;
 

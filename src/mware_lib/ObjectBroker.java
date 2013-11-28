@@ -35,7 +35,7 @@ public class ObjectBroker { //- Front-End der Middleware -
 
 
 	public void shutDown() {
-		
+		localNameService.shutdown();
 	}
 	// Beendet die Benutzung der Middleware in dieser Anwendung.
 

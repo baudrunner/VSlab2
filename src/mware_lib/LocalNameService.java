@@ -3,13 +3,21 @@ package mware_lib;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import name_service.HostDescriptor;
+import name_service.NameServerRecord;
 
 public class LocalNameService extends NameService{
 
 	public static int threadIDcntr = 0;
+	ArrayList<RemoteMethodCallListener> rmlcList = new ArrayList<RemoteMethodCallListener>();
+	RemoteListener remoteListenerThread;
+	boolean shutdown = false;
 	private	HostDescriptor host;
 	private String NameServerAdress;
 	ServerSocket servSocket; //auf diesem Socket werden Befehle (fuer z.B. methodenaufrufe) entgegengenommen
@@ -30,6 +38,7 @@ public class LocalNameService extends NameService{
 			connection = new Connection(sockToNameServer); //direkte verbindung zum NameServer
 			host = new HostDescriptor(sockToNameServer.getLocalAddress().toString().substring(1), servSocket.getLocalPort());
 			RemoteListener remoteListener = new RemoteListener(servSocket);
+			remoteListenerThread = remoteListener;
 			Thread t = new Thread(remoteListener);
 			t.start();
 		} catch (IOException e) {
@@ -81,21 +90,22 @@ public class LocalNameService extends NameService{
 	private class RemoteListener implements Runnable{
 		
 		ServerSocket serSock;
-
+		Socket s;
 		public RemoteListener(ServerSocket s){
 			serSock = s;
 		}
 
 		@Override
 		public void run() {
-			
+
 			while(true){
 				
 				try {
 					System.out.println("waiting for someone to connect...");
-					Socket s = serSock.accept();
+					s = serSock.accept();
 					System.out.println("...someone connected!");
 					RemoteMethodCallListener rmcl = new RemoteMethodCallListener(s);
+					rmlcList.add(rmcl);
 					Thread t = new Thread(rmcl);
 					System.out.println("spawning Thread...");
 					t.start();
@@ -105,6 +115,18 @@ public class LocalNameService extends NameService{
 				} 
 			}
 		}
+		
+		public void stop() {
+			shutdown = true;
+			try {
+				s.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
+		
 	}
 	
 	private class RemoteMethodCallListener implements Runnable{
@@ -126,7 +148,11 @@ public class LocalNameService extends NameService{
 				try {
 					rcd = (RemoteCallDescriptor)conn.receive();
 				} catch (IOException e) {
-					e.printStackTrace();
+					if(shutdown){
+						System.out.println("System wird heruntergefahren");
+					}else{
+						e.printStackTrace();
+					}
 				}
 				System.out.println(rcd.getMethod() + " on objekt " + rcd.getObjName() + " should be called.."); 
 				
@@ -147,9 +173,31 @@ public class LocalNameService extends NameService{
 			//}
 			
 		}
-
+		
+		public void stop() {
+			shutdown = true;
+			try {
+				conn.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
+	
+	
+	public void shutdown() {
+		
+		System.out.println("shutdown methode von LocalNameService aufgerufen");
+		shutdown = true;
+		for(RemoteMethodCallListener o: rmlcList){
+			o.stop();
+		}
+		remoteListenerThread.stop();
+	}
+
+	
+	
 	
 	
 }

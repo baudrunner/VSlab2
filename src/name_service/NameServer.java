@@ -5,15 +5,13 @@ import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import mware_lib.Connection;
-import mware_lib.NameServerRecord;
 
 
 public class NameServer {
 
 	private ServerSocket MySvrSocket;
 	
-	static int serverListenPort = 14009;
+	static int serverListenPort;
 	HashMap<String, NameServerRecord> remoteObjects = new HashMap<String, NameServerRecord>();
 	Lock mutex;
 
@@ -30,6 +28,12 @@ public class NameServer {
 	}
 
 	public static void main(String[] args) throws IOException {
+		if(args.length==1) {
+			serverListenPort=Integer.valueOf(args[0]);
+		}else {
+            System.out.println("Bitte Port als Parameter uebergeben");
+            return;
+		}
 		NameServer nameServer = new NameServer(serverListenPort);
 		nameServer.listen();
 	}

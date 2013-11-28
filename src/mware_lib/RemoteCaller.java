@@ -3,8 +3,8 @@ package mware_lib;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
+import name_service.HostDescriptor;
 
 public class RemoteCaller {
 
