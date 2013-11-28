@@ -16,7 +16,9 @@ public class LocalNameService extends NameService{
 
 	public static int threadIDcntr = 0;
 	ArrayList<RemoteMethodCallListener> rmlcList = new ArrayList<RemoteMethodCallListener>();
-	RemoteListener remoteListenerThread;
+	ArrayList<Thread> threadList = new ArrayList<Thread>();
+	RemoteListener remoteListenerThreadRunnable;
+	Thread remoteListenerThread;
 	boolean shutdown = false;
 	private	HostDescriptor host;
 	private String NameServerAdress;
@@ -38,8 +40,9 @@ public class LocalNameService extends NameService{
 			connection = new Connection(sockToNameServer); //direkte verbindung zum NameServer
 			host = new HostDescriptor(sockToNameServer.getLocalAddress().toString().substring(1), servSocket.getLocalPort());
 			RemoteListener remoteListener = new RemoteListener(servSocket);
-			remoteListenerThread = remoteListener;
+			remoteListenerThreadRunnable = remoteListener;
 			Thread t = new Thread(remoteListener);
+			remoteListenerThread = t;
 			t.start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -90,7 +93,6 @@ public class LocalNameService extends NameService{
 	private class RemoteListener implements Runnable{
 		
 		ServerSocket serSock;
-		Socket s;
 		public RemoteListener(ServerSocket s){
 			serSock = s;
 		}
@@ -98,20 +100,24 @@ public class LocalNameService extends NameService{
 		@Override
 		public void run() {
 
-			while(true){
+			while(!shutdown){
 				
 				try {
 					System.out.println("waiting for someone to connect...");
-					s = serSock.accept();
+					Socket s = serSock.accept();
 					System.out.println("...someone connected!");
 					RemoteMethodCallListener rmcl = new RemoteMethodCallListener(s);
 					rmlcList.add(rmcl);
 					Thread t = new Thread(rmcl);
+					threadList.add(t);
 					System.out.println("spawning Thread...");
 					t.start();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					if(shutdown){
+						System.out.println("shutdown...");
+					}else{
+						e.printStackTrace();
+					}
 				} 
 			}
 		}
@@ -119,7 +125,7 @@ public class LocalNameService extends NameService{
 		public void stop() {
 			shutdown = true;
 			try {
-				s.close();
+				serSock.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -189,11 +195,34 @@ public class LocalNameService extends NameService{
 	public void shutdown() {
 		
 		System.out.println("shutdown methode von LocalNameService aufgerufen");
+		
+		remoteListenerThreadRunnable.stop();
+		
+		try {
+			remoteListenerThread.join();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		shutdown = true;
+		System.out.println("fordere threads zum terminieren auf...");
 		for(RemoteMethodCallListener o: rmlcList){
 			o.stop();
 		}
-		remoteListenerThread.stop();
+		
+		System.out.println("warte darauf dass alle threads terminieren...");
+		for(Thread t: threadList){
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println("Alle listenerThreads beendet!");
+		
 	}
 
 	
