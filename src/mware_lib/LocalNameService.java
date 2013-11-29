@@ -1,11 +1,15 @@
 package mware_lib;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -52,7 +56,23 @@ public class LocalNameService extends NameService{
 	public void rebind(Object servant, String name) {
 		
 		NameServerRecord record = new NameServerRecord(host, name); // Port, Ip und Name 
-		Object[] recordOa = new Object[]{name, record}; // Port, Ip und Name 
+		byte[] recordRaw = null; 
+				
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		ObjectOutput objOutput = null;
+
+		  try {
+			objOutput = new ObjectOutputStream(outStream);
+			objOutput.writeObject(record);
+			recordRaw = outStream.toByteArray();
+			objOutput.close();
+			outStream.close();
+		} catch (IOException e) {
+			System.out.println("jut jebruellt Loewe aber.. -> Fehler beim Serialisieren!");
+			e.printStackTrace();
+		}   
+
+		Object[] recordOa = new Object[]{name, recordRaw}; // Port, Ip und Name 
 		remoteObjects.put(name, (RemoteCall_I)servant);
 		connMutex.lock();
 		connection.send(recordOa);
@@ -69,7 +89,16 @@ public class LocalNameService extends NameService{
 		
 		NameServerRecord targetRecord = null;
 		try {
-			targetRecord = (NameServerRecord)connection.receive();
+			byte[] rawByteArray = (byte[])connection.receive();
+			ByteArrayInputStream byteInStream = new ByteArrayInputStream(rawByteArray);
+		    ObjectInputStream objInStream = new ObjectInputStream(byteInStream);
+		    try {
+				targetRecord = (NameServerRecord)objInStream.readObject();
+			} catch (ClassNotFoundException e) {
+				System.out.println("jut jebruellt Loewe aber.. -> Fehler beim Deserialisieren!");
+				e.printStackTrace();
+			}
+		    
 		} catch (IOException e) {
 			e.printStackTrace();
 		}finally{

@@ -33,6 +33,7 @@ public class NameServer {
             System.out.println("Bitte Port als Parameter uebergeben");
             return;
 		}
+		serverListenPort = 14009;
 		NameServer nameServer = new NameServer(serverListenPort);
 		nameServer.listen();
 	}
@@ -86,7 +87,7 @@ public class NameServer {
 					clientConnection.send(remoteObjects.get((String)cmsg));
 				}else{
 					mutex.lock();
-					Object[] arraycmsg = (Object[]) cmsg;
+					Object[] arraycmsg = (Object[])cmsg;
 					remoteObjects.put( (String)arraycmsg[0], arraycmsg[1]);
 					mutex.unlock();
 					System.out.println("Neues Objekt zum NameServer hinzugefuegt");
