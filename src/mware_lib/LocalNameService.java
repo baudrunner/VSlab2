@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import name_service.HostDescriptor;
-import name_service.NameServerRecord;
-
 public class LocalNameService extends NameService{
 
 	public static int threadIDcntr = 0;
@@ -55,9 +52,10 @@ public class LocalNameService extends NameService{
 	public void rebind(Object servant, String name) {
 		
 		NameServerRecord record = new NameServerRecord(host, name); // Port, Ip und Name 
+		Object[] recordOa = new Object[]{name, record}; // Port, Ip und Name 
 		remoteObjects.put(name, (RemoteCall_I)servant);
 		connMutex.lock();
-		connection.send(record);
+		connection.send(recordOa);
 		connMutex.unlock();
 	}
 

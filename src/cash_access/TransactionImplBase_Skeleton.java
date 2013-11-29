@@ -1,6 +1,6 @@
 package cash_access;
 
-import name_service.NameServerRecord;
+import mware_lib.NameServerRecord;
 import mware_lib.RemoteCallDescriptor;
 import mware_lib.RemoteCaller;
 

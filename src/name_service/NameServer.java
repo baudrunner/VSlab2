@@ -6,13 +6,12 @@ import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-
 public class NameServer {
 
 	private ServerSocket MySvrSocket;
 	
 	static int serverListenPort;
-	HashMap<String, NameServerRecord> remoteObjects = new HashMap<String, NameServerRecord>();
+	HashMap<String, Object> remoteObjects = new HashMap<String, Object>();
 	Lock mutex;
 
 	
@@ -74,12 +73,7 @@ public class NameServer {
 				}
 				
 				System.out.println("received: " + cmsg);
-				if(cmsg instanceof NameServerRecord){ //Host meldet Objekt unter Name an
-					mutex.lock();
-					remoteObjects.put(((NameServerRecord) cmsg).getName(), (NameServerRecord)cmsg);
-					mutex.unlock();
-					System.out.println("Neues Objekt zum NameServer hinzugefuegt");
-				}else if(cmsg instanceof String){//Host moechte Eintrag von Objekt mit name 'cmsg'
+				if(cmsg instanceof String){//Host moechte Eintrag von Objekt mit name 'cmsg'
 					System.out.println("suche im Verzeichnis nach Objekt mit Name '" + (String)cmsg + "' ...");
 					mutex.lock();
 					Object orderedObject = remoteObjects.get((String)cmsg);
@@ -90,6 +84,12 @@ public class NameServer {
 						System.out.println("returning " + orderedObject);
 					}
 					clientConnection.send(remoteObjects.get((String)cmsg));
+				}else{
+					mutex.lock();
+					Object[] arraycmsg = (Object[]) cmsg;
+					remoteObjects.put( (String)arraycmsg[0], arraycmsg[1]);
+					mutex.unlock();
+					System.out.println("Neues Objekt zum NameServer hinzugefuegt");
 				}
 			}			
 		}

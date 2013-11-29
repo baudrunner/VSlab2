@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import name_service.HostDescriptor;
-
 public class RemoteCaller {
 
 	public static Object callMethod(HostDescriptor hd, RemoteCallDescriptor rcd){

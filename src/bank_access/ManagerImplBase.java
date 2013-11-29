@@ -2,7 +2,7 @@ package bank_access;
 
 import java.util.ArrayList;
 
-import name_service.NameServerRecord;
+import mware_lib.NameServerRecord;
 import mware_lib.RemoteCall_I;
 
 public abstract class ManagerImplBase implements RemoteCall_I {
